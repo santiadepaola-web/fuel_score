@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Your Daily Fuel Score</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#f9f8f5;font-family:'DM Sans',sans-serif;min-height:100vh;padding:40px 20px 80px}
+  .page{max-width:580px;margin:0 auto}
+  .eyebrow{font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#888;margin-bottom:6px;text-align:center}
+  .name-row{font-size:14px;color:#666;text-align:center;margin-bottom:32px}
+  .score-ring-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:28px}
+  .ring-container{position:relative;width:200px;height:200px;margin-bottom:16px}
+  .ring-svg{width:200px;height:200px;transform:rotate(-90deg)}
+  .ring-bg{fill:none;stroke:#e8e6e0;stroke-width:13}
+  .ring-fill{fill:none;stroke-width:13;stroke-linecap:round;stroke-dasharray:502;stroke-dashoffset:502;transition:stroke-dashoffset 2s cubic-bezier(.34,1.4,.64,1)}
+  .ring-inner{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+  .score-number{font-family:'DM Serif Display',serif;font-size:54px;line-height:1;display:block}
+  .score-label{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#aaa;margin-top:4px}
+  .score-tier{font-size:19px;font-weight:500;color:#1a1a1a;margin-bottom:10px;text-align:center}
+  .score-summary-card{background:#fff;border:1px solid #eee;border-radius:16px;padding:18px 22px;margin-bottom:24px}
+  .score-summary-label{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#aaa;margin-bottom:8px}
+  .score-summary-text{font-size:14px;color:#444;line-height:1.7}
+  .breakdown-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:28px}
+  .bk-card{background:#fff;border:1px solid #eee;border-radius:10px;padding:12px 10px;text-align:center}
+  .bk-val{font-size:20px;font-weight:500}
+  .bk-label{font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.08em;margin-top:3px}
+  .section-label{font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#aaa;margin-bottom:12px}
+  .section{margin-bottom:26px}
+  .insight-card{background:#fff;border:1px solid #eee;border-radius:14px;padding:14px 16px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start}
+  .insight-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px}
+  .ig{background:#EAF3DE}.ib{background:#E6F1FB}.it{background:#E1F5EE}.ia{background:#FAEEDA}
+  .insight-title{font-size:13px;font-weight:500;color:#1a1a1a;margin-bottom:3px}
+  .insight-body{font-size:12px;color:#666;line-height:1.6}
+  .gap-card{background:#fff;border:1px solid #eee;border-radius:14px;padding:13px 16px;margin-bottom:8px}
+  .gap-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .gap-title{font-size:13px;font-weight:500;color:#1a1a1a}
+  .gap-badge{font-size:11px;font-weight:500;padding:3px 10px;border-radius:100px}
+  .bl{background:#FAECE7;color:#993C1D}.bm{background:#FAEEDA;color:#854F0B}.bg{background:#EAF3DE;color:#3B6D11}
+  .bar-track{height:4px;background:#eee;border-radius:100px;overflow:hidden;margin-bottom:8px}
+  .bar-fill{height:100%;border-radius:100px;width:0%;transition:width 1.5s cubic-bezier(.34,1.2,.64,1)}
+  .gap-tip{font-size:12px;color:#666;line-height:1.55}
+  .divider{height:1px;background:#eee;margin:24px 0}
+  .agree-row{display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+  .agree-btn{padding:7px 15px;border:1px solid #ddd;border-radius:8px;font-size:12px;font-family:'DM Sans',sans-serif;background:#fff;color:#666;cursor:pointer;transition:all .15s}
+  .agree-btn:hover{background:#f5f4f0;color:#1a1a1a}
+  .agree-btn.sel{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+  .agree-label{font-size:11px;color:#aaa;text-align:center;margin-top:8px}
+  .cta-block{background:#fff;border:1px solid #eee;border-radius:16px;padding:24px;text-align:center;margin-top:32px}
+  .cta-headline{font-family:'DM Serif Display',serif;font-size:22px;color:#1a1a1a;margin-bottom:6px}
+  .cta-sub{font-size:13px;color:#666;margin-bottom:18px;line-height:1.6}
+  .cta-row{display:flex;gap:8px;max-width:360px;margin:0 auto}
+  .cta-input{flex:1;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;background:#fff;color:#1a1a1a;outline:none}
+  .cta-input:focus{border-color:#999}
+  .cta-btn{padding:10px 18px;background:#1a1a1a;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;transition:opacity .15s;white-space:nowrap}
+  .cta-btn:hover{opacity:.8}
+  .success-msg{font-size:12px;color:#3B6D11;text-align:center;margin-top:10px;display:none}
+  .demo-bar{background:#fff8ec;border:1px solid #f0c97a;border-radius:10px;padding:10px 14px;font-size:11px;color:#7a5500;margin-bottom:20px;line-height:1.7;display:none}
+</style>
+</head>
+<body>
+<div class="page">
+  <div id="demoBar" class="demo-bar"></div>
+  <p class="eyebrow">Daily Fuel Score</p>
+  <p class="name-row" id="nameRow"></p>
+  <div class="score-ring-wrap">
+    <div class="ring-container">
+      <svg class="ring-svg" viewBox="0 0 200 200">
+        <circle class="ring-bg" cx="100" cy="100" r="80"/>
+        <circle class="ring-fill" id="ringFill" cx="100" cy="100" r="80"/>
+      </svg>
+      <div class="ring-inner">
+        <span class="score-number" id="scoreNum">0</span>
+        <span class="score-label">/ 100</span>
+      </div>
+    </div>
+    <p class="score-tier" id="scoreTier">–</p>
+  </div>
+  <div class="score-summary-card">
+    <p class="score-summary-label">Score summary</p>
+    <p class="score-summary-text" id="scoreSummary"></p>
+  </div>
+  <div class="breakdown-grid" id="breakdownGrid"></div>
+  <div class="agree-row">
+    <button class="agree-btn" onclick="agree('yes',this)">Feels accurate</button>
+    <button class="agree-btn" onclick="agree('somewhat',this)">Somewhat</button>
+    <button class="agree-btn" onclick="agree('no',this)">Not really</button>
+  </div>
+  <p class="agree-label" id="agreeLabel">Does this score feel right?</p>
+  <div class="divider"></div>
+  <div class="section">
+    <p class="section-label">What you're doing well</p>
+    <div id="strengthsWrap"></div>
+  </div>
+  <div class="section">
+    <p class="section-label">Areas to work on</p>
+    <div id="gapsWrap"></div>
+  </div>
+  <div class="cta-block">
+    <p class="cta-headline">Track your score over time</p>
+    <p class="cta-sub">We're building an app to optimize fueling around your actual training. Join the waitlist for early access.</p>
+    <div class="cta-row">
+      <input class="cta-input" id="emailInput" type="email" placeholder="your@email.com"/>
+      <button class="cta-btn" onclick="joinWaitlist()">Join waitlist</button>
+    </div>
+    <p class="success-msg" id="successMsg">You're on the list.</p>
+  </div>
+</div>
+<script>
+const BANDS=[
+  {min:96,max:100,tier:"Peak fueling",color:"#1D9E75",summary:"You essentially did everything right today. Your nutrition, hydration, recovery, and movement were all aligned — this is what elite-level daily fueling looks like. The goal now is to replicate it. Days like this compound over time and become the baseline."},
+  {min:91,max:95,tier:"Exceptional day",color:"#1D9E75",summary:"Nearly flawless. You nailed your fueling fundamentals and your body has everything it needs to recover and perform. There are minor edges you could sharpen, but today was a genuinely high-performance day worth acknowledging."},
+  {min:86,max:90,tier:"Strong fueling",color:"#27A86A",summary:"You're firing on most cylinders. Nutrition timing, hydration, and recovery are all working in your favor. A couple of small refinements — likely around one meal or sleep quality — would push you into the elite range. You're close."},
+  {min:81,max:85,tier:"Well fueled",color:"#27A86A",summary:"Solid day overall. Your inputs are well-aligned with your output and your body is being supported. There are one or two gaps keeping you out of the top tier, but nothing critical. Consistency at this level delivers real results over time."},
+  {min:76,max:80,tier:"On track",color:"#639922",summary:"You're fueling reasonably well and your body is mostly supported — but there are gaps that are costing you energy or recovery you're not getting back. The fixes here are usually simple: one better meal, more water, or an extra hour of sleep."},
+  {min:71,max:75,tier:"Good foundation",color:"#639922",summary:"Your foundation is solid but your ceiling is higher. You're meeting the basics but not optimizing around your activity level. Targeted changes to timing or food quality would move your score and, more importantly, how you actually feel."},
+  {min:66,max:70,tier:"Room to grow",color:"#8FAD1E",summary:"You're doing some things right but there are clear, fixable gaps between what your body needs and what you gave it today. You likely felt the difference — energy dips, slower recovery, or inconsistent performance. The good news: the upside here is fast."},
+  {min:61,max:65,tier:"Developing",color:"#BA7517",summary:"Your fueling today left your body working harder than it should have to. A few things worked, but the gaps — likely in hydration, meal timing, or protein — are adding friction to your recovery and energy. Small consistent changes from here make a big difference."},
+  {min:56,max:60,tier:"Inconsistent fueling",color:"#BA7517",summary:"Today's fueling was inconsistent — some strong choices offset by gaps that are undermining your results. Your body is compensating, which takes energy away from performance and recovery. Identifying your one biggest gap and fixing it tomorrow is the move."},
+  {min:51,max:55,tier:"Below baseline",color:"#D07010",summary:"You're fueling below what your activity level demands. Whether it's skipped meals, low water, poor sleep, or high stress — your body is running a deficit today. You may not feel it immediately, but this compounds. One focused day can shift the trajectory."},
+  {min:46,max:50,tier:"Fueling gap",color:"#D07010",summary:"There's a meaningful gap between your energy output and your nutritional input today. Your body is pulling from reserves to keep you going, which slows recovery and drains next-day performance. Hydration and a real meal are the fastest levers to pull right now."},
+  {min:41,max:45,tier:"Under-fueled",color:"#D85A30",summary:"Today's fueling fell significantly short of what your body needed. Skipped meals, low hydration, poor sleep, or high stress — likely some combination — are stacking against you. The good news is that the gap between here and a 70+ score is mostly behavioral, not complicated."},
+  {min:36,max:40,tier:"Running on empty",color:"#D85A30",summary:"Your body is running on very little today. The inputs — food, water, sleep, recovery — are well below what your activity level demands. This is the kind of day that sets back progress if it becomes a pattern. Prioritize one thing tonight: either sleep or a solid meal."},
+  {min:31,max:35,tier:"Significant deficit",color:"#E24B4A",summary:"You're in a significant fueling deficit. Your body doesn't have what it needs to recover from today, let alone perform tomorrow. This isn't about perfection — it's about giving your system enough to function. Start with water and food before anything else."},
+  {min:26,max:30,tier:"Critical gap",color:"#E24B4A",summary:"Multiple core pillars — nutrition, hydration, sleep, and/or recovery — are all underserved today. Your body is doing its best with very little. Tomorrow doesn't need to be perfect, it just needs to be better. Pick the single easiest thing you can fix and start there."},
+  {min:21,max:25,tier:"Red zone",color:"#C82020",summary:"Today was rough on your body. With a score in this range, most of the foundational inputs are missing or severely compromised. Your recovery will be slow and your next-day energy will reflect it. Rest, water, and real food are the only priorities right now."},
+  {min:16,max:20,tier:"Severely under-fueled",color:"#C82020",summary:"Your fuel score reflects a day where your body was running on almost nothing. Whether it was intentional or circumstantial, the impact is real — on hormones, recovery, and how you'll feel tomorrow. No judgment, just data. Start fresh in the morning."},
+  {min:11,max:15,tier:"Body in survival mode",color:"#A31515",summary:"At this score, your body has shifted into conservation mode. Chronic under-fueling at this level suppresses metabolism, impairs hormone function, and slows recovery significantly. This is worth taking seriously — not just for performance, but for your overall health."},
+  {min:6,max:10,tier:"Depletion zone",color:"#A31515",summary:"Very little fuel, very high demand. Your body has nothing left in reserve to draw from. If this is a recurring pattern, it's worth speaking with someone about your relationship with food and recovery — not as a criticism, but because you deserve to feel better than this."},
+  {min:1,max:5,tier:"Complete deficit",color:"#8B0000",summary:"A score this low means almost every fueling pillar was missed today. Your body absorbed the consequences — in fatigue, inflammation, and impaired recovery. Tomorrow is a fresh start. The distance between here and feeling good is smaller than it seems when you're consistent."},
+  {min:0,max:0,tier:"Zero fuel day",color:"#8B0000",summary:"Today your body received essentially nothing it needed to function and recover. This is a signal worth paying attention to. Whatever got in the way today — stress, circumstance, or habit — your body is telling you it needs more. One better choice tomorrow is all it takes to start."}
+];
+function getBand(s){return BANDS.find(b=>s>=b.min&&s<=b.max)||BANDS[BANDS.length-1];}
+function p(key,fallback=null){const v=new URLSearchParams(window.location.search).get(key);if(v===null)return fallback;const n=Number(v);return isNaN(n)?v:n;}
+function clamp(v,lo,hi){return Math.min(hi,Math.max(lo,v));}
+function animCount(el,target,dur){const st=performance.now();(function step(ts){const prog=Math.min((ts-st)/dur,1);el.textContent=Math.round((1-Math.pow(1-prog,3))*target);if(prog<1)requestAnimationFrame(step);})(performance.now());}
+function bkCard(label,val,max,color){const pct=Math.round(clamp(val,0,max)/max*100);return `<div class="bk-card"><div class="bk-val" style="color:${color}">${pct}<span style="font-size:12px;font-weight:400">%</span></div><div class="bk-label">${label}</div></div>`;}
+function sCard(icon,cls,title,body){return `<div class="insight-card"><div class="insight-icon ${cls}">${icon}</div><div><p class="insight-title">${title}</p><p class="insight-body">${body}</p></div></div>`;}
+function gCard(title,badgeCls,badgeText,barColor,barPct,tip){return `<div class="gap-card"><div class="gap-header"><span class="gap-title">${title}</span><span class="gap-badge ${badgeCls}">${badgeText}</span></div><div class="bar-track"><div class="bar-fill" style="background:${barColor}" data-pct="${barPct}"></div></div><p class="gap-tip">${tip}</p></div>`;}
+window.addEventListener('load',()=>{
+  const raw=p('score',72);
+  const score=clamp(Math.round(raw),0,100);
+  const name=p('name','');
+  const nutrition=p('nutrition',0);
+  const hydration=p('hydration',0);
+  const recovery=p('recovery',0);
+  const protein=p('protein',0);
+  const energy=p('energy',0);
+  const movement=p('movement',0);
+  const hormone=p('hormone',0);
+  const sleep_val=p('sleep',2);
+  const water_val=p('water',2);
+  const stress_val=p('stress',2);
+  const workout_val=p('workout',3);
+  const meal_skip=p('meal_skip',0);
+  const flag_h=p('flag_h',0);
+  const flag_n=p('flag_n',0);
+  const flag_r=p('flag_r',0);
+  const flag_p=p('flag_p',0);
+  const flag_e=p('flag_e',0);
+  const isDemo=!window.location.search||window.location.search==='?demo';
+  if(isDemo){const db=document.getElementById('demoBar');db.style.display='block';db.innerHTML='<strong>Preview mode</strong> — no quiz data detected. Showing a demo result (score: 72).<br>Once connected to Tally, every section below will be personalized to the user\'s answers.';}
+  if(name) document.getElementById('nameRow').textContent="Here's how you fueled today, "+name+".";
+  const band=getBand(score);
+  const ring=document.getElementById('ringFill');
+  ring.style.stroke=band.color;
+  ring.style.strokeDashoffset=502-(score/100)*502;
+  setTimeout(()=>{
+    animCount(document.getElementById('scoreNum'),score,1600);
+    document.getElementById('scoreNum').style.color=band.color;
+    document.getElementById('scoreTier').textContent=band.tier;
+    document.getElementById('scoreSummary').textContent=band.summary;
+  },150);
+  const maxes={Nutrition:35,Hydration:13,Recovery:20,Protein:8,Energy:5,Hormone:10};
+  const cols={Nutrition:'#1D9E75',Hydration:'#378ADD',Recovery:'#7F77DD',Protein:'#D85A30',Energy:'#BA7517',Hormone:'#639922'};
+  const vals={Nutrition:nutrition,Hydration:hydration,Recovery:recovery,Protein:protein,Energy:energy,Hormone:hormone};
+  document.getElementById('breakdownGrid').innerHTML=Object.keys(maxes).map(k=>bkCard(k,vals[k],maxes[k],cols[k])).join('');
+  const strengths=[];
+  if(sleep_val===1) strengths.push(sCard('🌙','it','Great sleep','8+ hours last night — this is the single highest-leverage recovery tool you have. Your body rebuilt overnight.'));
+  else if(sleep_val===2) strengths.push(sCard('🌙','ib','Solid sleep','6–8 hours is in the functional range. You\'re recovering well enough to perform today.'));
+  if(water_val===1) strengths.push(sCard('💧','ib','Excellent hydration','128oz is optimal for active days. Cellular function, nutrient transport, and performance are all supported.'));
+  else if(water_val===2) strengths.push(sCard('💧','ib','Good hydration','80oz keeps you well above the threshold where dehydration starts impairing performance.'));
+  if(stress_val===1) strengths.push(sCard('🧘','ig','Low stress day','Cortisol is low, which means your body can actually use the nutrients you\'re giving it efficiently.'));
+  if(workout_val===1||workout_val===4) strengths.push(sCard('⚡','it','Training completed','Getting the workout in is the foundation. Your nutrition now needs to support what you just did.'));
+  if(flag_n===0&&nutrition>=15) strengths.push(sCard('🥗','ig','Strong food quality','Your meal choices today are giving your body the fuel it needs to perform and recover.'));
+  if(flag_p===0&&protein>=6) strengths.push(sCard('💪','it','Protein on target','You\'re meeting your protein threshold relative to body weight. Recovery and muscle maintenance are supported.'));
+  if(flag_r===0&&recovery>=6) strengths.push(sCard('♻️','ia','Intentional recovery','Actively managing recovery — not just rest — is what separates consistent performers from everyone else.'));
+  if(strengths.length===0) strengths.push(sCard('✅','ig','You showed up','Completing this means you\'re paying attention to your fuel. That awareness is the first step.'));
+  document.getElementById('strengthsWrap').innerHTML=strengths.slice(0,3).join('');
+  const gaps=[];
+  if(flag_h===1||water_val>=3) gaps.push(gCard('Hydration','bl','Needs work','#D85A30',Math.max(15,Math.min(45,water_val*15+10)),'You\'re under-hydrated relative to your activity level. Even mild dehydration (1–2%) measurably impairs performance and recovery. Start tomorrow with 16oz before breakfast.'));
+  if(flag_n===1||nutrition<10) gaps.push(gCard('Meal quality & timing','bm','Improvable','#BA7517',Math.max(20,Math.min(60,50-nutrition*2)),'Your food choices today are leaving energy on the table. Whole food meals with protein + carbs + fat at regular intervals stabilizes blood sugar and fuels performance.'));
+  if(meal_skip>=1) gaps.push(gCard('Skipped meals','bl','Needs work','#D85A30',Math.min(80,meal_skip*25+30),'Skipping '+meal_skip+' meal'+(meal_skip>1?'s':'')+' today created an energy deficit your body compensated for. This raises cortisol and impairs recovery — especially on training days.'));
+  if(flag_p===1||protein<4) gaps.push(gCard('Protein intake','bm','Under target','#BA7517',Math.max(25,Math.min(65,55-protein*3)),'You\'re under your protein threshold for your body weight. Muscle protein synthesis drops off significantly below 0.7g/lb. Try adding a protein source to your next two meals.'));
+  if(sleep_val>=3) gaps.push(gCard('Sleep & recovery','bl','Needs work','#D85A30',Math.min(85,sleep_val*20),'Under 6 hours significantly impairs hormonal recovery, glucose metabolism, and next-day performance. Prioritizing sleep tonight will move your score more than almost any other single change.'));
+  if(stress_val>=3) gaps.push(gCard('Stress load','bm','High','#BA7517',Math.min(75,stress_val*18),'High cortisol from stress directly competes with recovery. Even good nutrition is less effective when your nervous system is in overdrive. Consider a 10-min wind-down before sleep.'));
+  if(flag_e===1||energy<0) gaps.push(gCard('Energy stability','bm','Inconsistent','#BA7517',Math.max(30,Math.min(70,40-energy*3)),'Your energy levels today suggest your fueling is reactive rather than strategic. Consistent meal timing and anchoring carbs around activity are the fastest fixes.'));
+  if(gaps.length===0) gaps.push(gCard('Keep the streak going','bg','Looking good','#639922',20,'No critical gaps today. The challenge now is consistency — come back tomorrow and see if your score holds.'));
+  document.getElementById('gapsWrap').innerHTML=gaps.slice(0,4).join('');
+  setTimeout(()=>{document.querySelectorAll('.bar-fill').forEach(b=>{b.style.width=b.dataset.pct+'%';});},400);
+});
+function agree(val,btn){document.querySelectorAll('.agree-btn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');const m={yes:'Thanks — that helps validate the scoring.',somewhat:'Noted. The app will be more precise.',no:'Got it — your feedback helps us calibrate.'};document.getElementById('agreeLabel').textContent=m[val];}
+function joinWaitlist(){const e=document.getElementById('emailInput');if(!e.value||!e.value.includes('@')){e.style.borderColor='#D85A30';return;}e.style.display='none';document.querySelector('.cta-btn').style.display='none';document.getElementById('successMsg').style.display='block';}
+</script>
+</body>
+</html>
