@@ -202,7 +202,24 @@ window.addEventListener('load',()=>{
   setTimeout(()=>{document.querySelectorAll('.bar-fill').forEach(b=>{b.style.width=b.dataset.pct+'%';});},400);
 });
 function agree(val,btn){document.querySelectorAll('.agree-btn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');const m={yes:'Thanks — that helps validate the scoring.',somewhat:'Noted. The app will be more precise.',no:'Got it — your feedback helps us calibrate.'};document.getElementById('agreeLabel').textContent=m[val];}
-function joinWaitlist(){const e=document.getElementById('emailInput');if(!e.value||!e.value.includes('@')){e.style.borderColor='#D85A30';return;}e.style.display='none';document.querySelector('.cta-btn').style.display='none';document.getElementById('successMsg').style.display='block';}
+function joinWaitlist(){
+  const e=document.getElementById('emailInput');
+  if(!e.value||!e.value.includes('@')){e.style.borderColor='#D85A30';return;}
+  const score=document.getElementById('scoreNum').textContent;
+  const btn=document.querySelector('.cta-btn');
+  btn.textContent='Joining...';
+  btn.disabled=true;
+  fetch('https://script.google.com/macros/s/AKfycbzyFRLdhBdEq2LAmfIl98__ZcK18xRe_8LNOUi4P0NMOvaabLnjT9Ib9JRKXUX_13E_/exec',{
+    method:'POST',
+    mode:'no-cors',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({email:e.value,score:score})
+  }).finally(()=>{
+    e.style.display='none';
+    btn.style.display='none';
+    document.getElementById('successMsg').style.display='block';
+  });
+}
 </script>
 </body>
 </html>
