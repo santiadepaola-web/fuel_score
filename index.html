@@ -195,15 +195,17 @@ function agree(val,btn){document.querySelectorAll('.agree-btn').forEach(b=>b.cla
 function joinWaitlist(){
   const e=document.getElementById('emailInput');
   if(!e.value||!e.value.includes('@')){e.style.borderColor='#D85A30';return;}
-  const score=document.getElementById('scoreNum').textContent;
+  const scoreVal=document.getElementById('scoreNum').textContent;
   const btn=document.querySelector('.cta-btn');
   btn.textContent='Joining...';
   btn.disabled=true;
-  fetch('https://script.google.com/macros/s/AKfycbzyFRLdhBdEq2LAmfIl98__ZcK18xRe_8LNOUi4P0NMOvaabLnjT9Ib9JRKXUX_13E_/exec',{
+  const formData=new FormData();
+  formData.append('email',e.value);
+  formData.append('score',scoreVal);
+  fetch('https://script.google.com/macros/s/AKfycbwTAqMNE6PkE0OyIlZ8T7Jf448ZRC03QcNF6W9LpksVjCk8MNjIacjCxn8bHys-f20/exec',{
     method:'POST',
     mode:'no-cors',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({email:e.value,score:score})
+    body:formData
   }).finally(()=>{
     e.style.display='none';
     btn.style.display='none';
