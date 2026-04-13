@@ -23,10 +23,6 @@
   .score-summary-card{background:#fff;border:1px solid #eee;border-radius:16px;padding:18px 22px;margin-bottom:24px}
   .score-summary-label{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#aaa;margin-bottom:8px}
   .score-summary-text{font-size:14px;color:#444;line-height:1.7}
-  .breakdown-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:28px}
-  .bk-card{background:#fff;border:1px solid #eee;border-radius:10px;padding:12px 10px;text-align:center}
-  .bk-val{font-size:20px;font-weight:500}
-  .bk-label{font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.08em;margin-top:3px}
   .section-label{font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#aaa;margin-bottom:12px}
   .section{margin-bottom:26px}
   .insight-card{background:#fff;border:1px solid #eee;border-radius:14px;padding:14px 16px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start}
@@ -135,7 +131,6 @@ function getBand(s){return BANDS.find(b=>s>=b.min&&s<=b.max)||BANDS[BANDS.length
 function p(key,fallback=null){const v=new URLSearchParams(window.location.search).get(key);if(v===null)return fallback;const n=Number(v);return isNaN(n)?v:n;}
 function clamp(v,lo,hi){return Math.min(hi,Math.max(lo,v));}
 function animCount(el,target,dur){const st=performance.now();(function step(ts){const prog=Math.min((ts-st)/dur,1);el.textContent=Math.round((1-Math.pow(1-prog,3))*target);if(prog<1)requestAnimationFrame(step);})(performance.now());}
-function bkCard(label,val,max,color){const pct=Math.round(clamp(val,0,max)/max*100);return `<div class="bk-card"><div class="bk-val" style="color:${color}">${pct}<span style="font-size:12px;font-weight:400">%</span></div><div class="bk-label">${label}</div></div>`;}
 function sCard(icon,cls,title,body){return `<div class="insight-card"><div class="insight-icon ${cls}">${icon}</div><div><p class="insight-title">${title}</p><p class="insight-body">${body}</p></div></div>`;}
 function gCard(title,badgeCls,badgeText,barColor,barPct,tip){return `<div class="gap-card"><div class="gap-header"><span class="gap-title">${title}</span><span class="gap-badge ${badgeCls}">${badgeText}</span></div><div class="bar-track"><div class="bar-fill" style="background:${barColor}" data-pct="${barPct}"></div></div><p class="gap-tip">${tip}</p></div>`;}
 window.addEventListener('load',()=>{
