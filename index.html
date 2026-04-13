@@ -82,7 +82,6 @@
     <p class="score-summary-label">Score summary</p>
     <p class="score-summary-text" id="scoreSummary"></p>
   </div>
-  <div class="breakdown-grid" id="breakdownGrid"></div>
   <div class="agree-row">
     <button class="agree-btn" onclick="agree('yes',this)">Feels accurate</button>
     <button class="agree-btn" onclick="agree('somewhat',this)">Somewhat</button>
@@ -173,10 +172,6 @@ window.addEventListener('load',()=>{
     document.getElementById('scoreTier').textContent=band.tier;
     document.getElementById('scoreSummary').textContent=band.summary;
   },150);
-  const maxes={Nutrition:35,Hydration:13,Recovery:20,Protein:8,Energy:5,Hormone:10};
-  const cols={Nutrition:'#1D9E75',Hydration:'#378ADD',Recovery:'#7F77DD',Protein:'#D85A30',Energy:'#BA7517',Hormone:'#639922'};
-  const vals={Nutrition:nutrition,Hydration:hydration,Recovery:recovery,Protein:protein,Energy:energy,Hormone:hormone};
-  document.getElementById('breakdownGrid').innerHTML=Object.keys(maxes).map(k=>bkCard(k,vals[k],maxes[k],cols[k])).join('');
   const strengths=[];
   if(sleep_val===1) strengths.push(sCard('🌙','it','Great sleep','8+ hours last night — this is the single highest-leverage recovery tool you have. Your body rebuilt overnight.'));
   else if(sleep_val===2) strengths.push(sCard('🌙','ib','Solid sleep','6–8 hours is in the functional range. You\'re recovering well enough to perform today.'));
